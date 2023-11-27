@@ -33,7 +33,7 @@ is_connected <- is.connected(rede)
 print(is_connected)
 
 if (!is_connected) {
-
+  
   num_components <- length(components(rede))
   print(num_components)
   
@@ -50,7 +50,15 @@ assortativity_degree(rede)
 
 # media caminhos mais curtos
 
+# 7.914034
 mean_distance(rede)
+
+# 0.3453069
+log(10, vcount(rede))
+
+# Desta forma, pode-se concluir que a distância média não é pequena,
+# pois é bastante diferente do logaritmo do número de nós na rede.
+
 
 # diametro
 
@@ -87,8 +95,15 @@ print(num_closed_triangles)
 
 # Parâmetro de heterogeneidade
 
-graus <- degree(rede)
-(heterogeneidade <- var(graus) / mean(graus)^2)
+
+deg <- degree(rede, mode="all")
+
+hist(deg, breaks=seq(0, max(deg)+1, by=1), col="blue", xlab="Grau", ylab="Frequência", main="Distribuição de graus")
+plot(deg, pch=20, col="blue", cex=2, xlab="Grau", ylab="Frequência", main="Distribuição de graus")
+
+
+(ht <- mean(deg^2) / mean(deg)^2)
+
 
 
 # Calcular a coreness para cada nó na rede
@@ -103,6 +118,10 @@ for (i in 1:num_conchas) {
   print(paste("Número de nós na concha", i, ":", dimensao_concha))
 }
 
+plot(rede, vertex.size=5, vertex.label=NA, edge.arrow.size=0.5, 
+     edge.curved=0.2, edge.color="gray", vertex.color="blue", vertex.frame.color="white", 
+     vertex.label.color="black", layout=layout.fruchterman.reingold, main="Rede")
+
 ############################## 2 ########################################
 
 
@@ -111,6 +130,7 @@ for (i in 1:num_conchas) {
 componentes <- components(rede)
 maior_componente <- which.max(componentes$csize)
 (componente_gigante <- induced.subgraph(rede, which(componentes$membership == maior_componente)))
+plot(componente_gigante)
 
 # dimensao da componente gigante
 
@@ -141,11 +161,20 @@ assortativity_degree(componente_gigante)
 
 mean_distance(componente_gigante)
 
+log(10, vcount(componente_gigante))
+
+# Desta forma, pode-se concluir que a distância média não é pequena,
+# pois é bastante diferente do logaritmo do número de nós na rede.
+
+
+
 # diametro da componente gigante
 
 diameter(componente_gigante)
 
 # A distrância média da componente gigante é moderada à semelhança da rede
+
+
 
 
 # Estudo e caracterização da existência de triângulos na rede
@@ -165,6 +194,15 @@ adj_matrix <- as.matrix(get.adjacency(componente_gigante))
 
 graus <- degree(componente_gigante)
 (heterogeneidade <- var(graus) / mean(graus)^2)
+
+deg <- degree(componente_gigante, mode="all")
+
+hist(deg, breaks=seq(0, max(deg)+1, by=1), col="blue", xlab="Grau", ylab="Frequência", main="Distribuição de graus")
+plot(deg, pch=20, col="blue", cex=2, xlab="Grau", ylab="Frequência", main="Distribuição de graus")
+
+
+(ht <- mean(deg^2) / mean(deg)^2)
+
 
 
 ## ???
@@ -191,6 +229,10 @@ for (i in 1:num_conchas) {
   print(paste("Número de nós na concha", i, ":", dimensao_concha))
 }
 
+
+plot(componente_gigante, vertex.size=5, vertex.label=NA, edge.arrow.size=0.5, 
+     edge.curved=0.2, edge.color="gray", vertex.color="blue", vertex.frame.color="white", 
+     vertex.label.color="black", layout=layout.fruchterman.reingold, main="Componente Gigante")
 
 
 
