@@ -193,7 +193,6 @@ adj_matrix <- as.matrix(get.adjacency(componente_gigante))
 # Parâmetro de heterogeneidade
 
 graus <- degree(componente_gigante)
-(heterogeneidade <- var(graus) / mean(graus)^2)
 
 deg <- degree(componente_gigante, mode="all")
 
