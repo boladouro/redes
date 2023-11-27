@@ -53,8 +53,8 @@ assortativity_degree(rede)
 # 7.914034
 mean_distance(rede)
 
-# 0.3453069
-log(10, vcount(rede))
+# 2.895975
+log10(vcount(rede))
 
 # Desta forma, pode-se concluir que a distância média não é pequena,
 # pois é bastante diferente do logaritmo do número de nós na rede.
@@ -161,7 +161,7 @@ assortativity_degree(componente_gigante)
 
 mean_distance(componente_gigante)
 
-log(10, vcount(componente_gigante))
+log10(vcount(componente_gigante))
 
 # Desta forma, pode-se concluir que a distância média não é pequena,
 # pois é bastante diferente do logaritmo do número de nós na rede.
