@@ -1,6 +1,6 @@
 library(igraph)
 
-rede <- read.graph("trab_links.txt", format = c("edgelist"), directed=F)
+rede <- read_graph("trab_links.txt", format = c("edgelist"), directed=F)
 plot(rede)
 
 
