@@ -1,9 +1,9 @@
 library(igraph)
 
 rede <- read_graph("trab_links.txt", format = c("edgelist"), directed=F)
-# Salvar o gráfico em um arquivo SVG
-svg("Imagens/rede_grafo.svg")
-plot(rede)
+
+svglite::svglite("Imagens/rede_grafo.svg")
+plot(rede, vertex.size = 7, vertex.label.cex = .35)
 dev.off()
 
 
@@ -133,8 +133,8 @@ plot(rede, vertex.size=5, vertex.label=NA, edge.arrow.size=0.5,
 componentes <- components(rede)
 maior_componente <- which.max(componentes$csize)
 (componente_gigante <- induced.subgraph(rede, which(componentes$membership == maior_componente)))
-svg("Imagens/componente_gigante.svg")
-plot(componente_gigante)
+svglite::svglite("Imagens/componente_gigante.svg")
+plot(componente_gigante, vertex.size = 8, vertex.label.cex = .4)
 dev.off()
 
 # dimensao da componente gigante
