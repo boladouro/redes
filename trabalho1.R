@@ -1,7 +1,10 @@
 library(igraph)
 
 rede <- read_graph("trab_links.txt", format = c("edgelist"), directed=F)
+# Salvar o gráfico em um arquivo SVG
+svg("Imagens/rede_grafo.svg")
 plot(rede)
+dev.off()
 
 
 # dimensao da rede
@@ -130,7 +133,9 @@ plot(rede, vertex.size=5, vertex.label=NA, edge.arrow.size=0.5,
 componentes <- components(rede)
 maior_componente <- which.max(componentes$csize)
 (componente_gigante <- induced.subgraph(rede, which(componentes$membership == maior_componente)))
+svg("Imagens/componente_gigante.svg")
 plot(componente_gigante)
+dev.off()
 
 # dimensao da componente gigante
 
@@ -142,7 +147,7 @@ plot(componente_gigante)
 
 # densidade da componente gigante
 
-graph.density(componente_gigante)
+round(graph.density(componente_gigante),3)
 
 # grau medio da componente gigante
 
@@ -161,6 +166,7 @@ assortativity_degree(componente_gigante)
 
 mean_distance(componente_gigante)
 
+
 log10(vcount(componente_gigante))
 
 # Desta forma, pode-se concluir que a distância média não é pequena,
@@ -173,6 +179,8 @@ log10(vcount(componente_gigante))
 diameter(componente_gigante)
 
 # A distrância média da componente gigante é moderada à semelhança da rede
+
+# Distância grande
 
 
 
