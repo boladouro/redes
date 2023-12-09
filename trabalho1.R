@@ -1,10 +1,10 @@
 library(igraph)
 
 rede <- read_graph("trab_links.txt", format = c("edgelist"), directed=F)
+# Salvar o gráfico em um arquivo SVG
 
-svglite::svglite("Imagens/rede_grafo.svg")
 plot(rede, vertex.size = 7, vertex.label.cex = .35)
-dev.off()
+
 
 
 # dimensao da rede
@@ -18,6 +18,7 @@ ecount(rede)
 # densidade
 
 graph.density(rede)
+edge_density(rede, loops = FALSE)
 
 # grau medio
 
@@ -26,7 +27,29 @@ mean(degree(rede))
 
 # distribuicao de graus
 
-degree_distribution(rede)
+round(degree_distribution(rede),2)
+
+# do a ggplot barplot of degree distribution with the values above each bar
+
+library(ggplot2)
+
+degree_dist <- round(degree_distribution(rede), 2)
+
+# Cria um data frame com os graus e suas proporções
+(degree_df <- data.frame(Grau = 0:(length(degree_dist)-1), Proporcao = degree_dist))
+
+
+
+# Cria o gráfico de barras com as barras em laranja
+ggplot(degree_df, aes(x = factor(Grau), y = Proporcao)) +
+  geom_bar(stat = "identity", fill = "orange") +
+  geom_text(aes(label = Proporcao), vjust = -0.5, size = 3) +
+  labs(x = "Grau", y = "Proporção", title = "Distribuição de Grau na Rede") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+ggsave("Imagens/distribuicao_grau_rede.svg")
+
 
 
 # verificação se a rede é conexa
@@ -90,7 +113,25 @@ adj_matrix <- as.matrix(get.adjacency(rede))
 num_triangles <- sum(adj_matrix %*% adj_matrix %*% adj_matrix) / 6
 print(num_triangles)
 
+sum(count_triangles(rede))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Calcular o número de triângulos fechados
+
 
 num_closed_triangles <- sum(diag(adj_matrix %*% adj_matrix %*% adj_matrix)) / 2
 print(num_closed_triangles)
@@ -121,6 +162,68 @@ for (i in 1:num_conchas) {
   print(paste("Número de nós na concha", i, ":", dimensao_concha))
 }
 
+
+ggplot(data.frame(coreness_values), aes(x = coreness_values)) +
+  geom_bar(stat = "count", fill = "orange") +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, size = 3) +
+  labs(x = "Concha", y = "Número de nós", title = "Distribuição de Conchas na Rede") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  scale_x_continuous(breaks = 1:num_conchas)
+ggsave("Imagens/distribuicao_conchas_rede.svg")
+
+# percentagem de nos em cada concha
+
+for (i in 1:num_conchas) {
+  dimensao_concha <- sum(coreness_values == i)
+  print(paste("Percentagem de nós na concha", i, ":", (dimensao_concha / vcount(rede)) * 100))
+}
+
+# grafico circular com a percentagem de nos em cada concha
+
+ggplot(data.frame(coreness_values), aes(x = coreness_values)) +
+  geom_bar(stat = "count", fill = "orange") +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, size = 3) +
+  labs(x = "Concha", y = "Número de nós", title = "Distribuição de Conchas na Rede") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  scale_x_continuous(breaks = 1:num_conchas)
+
+
+data <- data.frame(
+  concha = 1:num_conchas,
+  percentagem = NA
+)
+
+for (i in 1:num_conchas) {
+  data$percentagem[i] <- round((sum(coreness_values == i) / vcount(rede)) * 100, 2)
+}
+
+# grafico circular com as percentagens como legenda
+
+
+
+data_filtered <- subset(data, percentagem != 0)
+
+ggplot(data = data_filtered, aes(x = "", y = percentagem, fill = factor(concha))) +
+  geom_bar(stat = "identity", width = 1, color = "white") +
+  coord_polar("y", start = 0) +
+  labs(title = "Percentagem de nós em cada concha", fill = "Concha") +
+  theme_void() +
+  theme(legend.position = "right") +
+  geom_text(aes(label = paste0(round(percentagem,1), "%")), position = position_stack(vjust = 0.5), angle = 60)
+ggsave("Imagens/percentagem_conchas_rede.svg")
+
+
+
+
+
+
+
+
+
+
+
 plot(rede, vertex.size=5, vertex.label=NA, edge.arrow.size=0.5, 
      edge.curved=0.2, edge.color="gray", vertex.color="blue", vertex.frame.color="white", 
      vertex.label.color="black", layout=layout.fruchterman.reingold, main="Rede")
@@ -133,9 +236,8 @@ plot(rede, vertex.size=5, vertex.label=NA, edge.arrow.size=0.5,
 componentes <- components(rede)
 maior_componente <- which.max(componentes$csize)
 (componente_gigante <- induced.subgraph(rede, which(componentes$membership == maior_componente)))
-svglite::svglite("Imagens/componente_gigante.svg")
-plot(componente_gigante, vertex.size = 8, vertex.label.cex = .4)
-dev.off()
+plot(componente_gigante, vertex.size = 7, vertex.label.cex = .35)
+
 
 # dimensao da componente gigante
 
