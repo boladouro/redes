@@ -1,4 +1,5 @@
 library(igraph)
+library(ggplot2)
 
 rede <- read_graph("trab_links.txt", format = c("edgelist"), directed=F)
 # Salvar o gráfico em um arquivo SVG
@@ -16,12 +17,9 @@ vcount(rede)
 ecount(rede)
 
 # densidade
-
-graph.density(rede)
 edge_density(rede, loops = FALSE)
 
 # grau medio
-
 mean(degree(rede))
 
 
@@ -40,7 +38,7 @@ degree_dist <- round(degree_distribution(rede), 2)
 
 
 
-# Cria o gráfico de barras com as barras em laranja
+# Cria o gráfico de barras com a distribuição de grau na rede
 ggplot(degree_df, aes(x = factor(Grau), y = Proporcao)) +
   geom_bar(stat = "identity", fill = "orange") +
   geom_text(aes(label = Proporcao), vjust = -0.5, size = 3) +
@@ -55,13 +53,14 @@ ggsave("Imagens/distribuicao_grau_rede.svg")
 # verificação se a rede é conexa
 # caso não seja indica-se o tamanho mínimo e máximo da componente conexa
 
-is_connected <- is.connected(rede)
+(is_connected <- is.connected(rede))
 print(is_connected)
 
+# identificação do do número de componentes, tamanho mínimo e máximo da componente conexa
 if (!is_connected) {
   
   num_components <- length(components(rede))
-  print(num_components)
+  print(paste("Número de componentes:", num_components))
   
   component_sizes <- sizes(components(rede))
   min_size <- min(component_sizes)
@@ -70,25 +69,26 @@ if (!is_connected) {
   print(paste("Tamanho máximo da componente conexa:", max_size))
 }
 
-# Associação de grau
+# associação de grau
 
 assortativity_degree(rede)
 
-# media caminhos mais curtos
+# diametro
 
-# 7.914034
+diameter(rede)
+
+# média dos caminhos mais curtos (distânci média)
 mean_distance(rede)
 
-# 2.895975
+
+# logaritmo para averiguar se a distância média é pequena
 log10(vcount(rede))
 
 # Desta forma, pode-se concluir que a distância média não é pequena,
 # pois é bastante diferente do logaritmo do número de nós na rede.
 
 
-# diametro
 
-diameter(rede)
 
 
 # Uma distância média de 7.91 pode ser considerada moderada, 
@@ -100,68 +100,39 @@ diameter(rede)
 # enquanto ainda há uma certa distância entre os pares mais distantes.
 
 
-# Estudo da existência de triângulos na rede
+# estudo da existência de triângulos na rede
 
+# coeficiente de clustering da rede
 transitivity(rede, type = "global")
 
-triangles(rede)
 
-# Obter a matriz de adjacência
-adj_matrix <- as.matrix(get.adjacency(rede))
-
-# Calcular o número de triângulos
-num_triangles <- sum(adj_matrix %*% adj_matrix %*% adj_matrix) / 6
-print(num_triangles)
-
-sum(count_triangles(rede))
+# calcula o número de triângulos fechados
+(numero_triangulos_rede <- sum(count_triangles(rede)))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Calcular o número de triângulos fechados
-
-
-num_closed_triangles <- sum(diag(adj_matrix %*% adj_matrix %*% adj_matrix)) / 2
-print(num_closed_triangles)
 
 
 # Parâmetro de heterogeneidade
 
 
 deg <- degree(rede, mode="all")
-
-hist(deg, breaks=seq(0, max(deg)+1, by=1), col="blue", xlab="Grau", ylab="Frequência", main="Distribuição de graus")
-plot(deg, pch=20, col="blue", cex=2, xlab="Grau", ylab="Frequência", main="Distribuição de graus")
-
-
 (ht <- mean(deg^2) / mean(deg)^2)
 
 
 
-# Calcular a coreness para cada nó na rede
+# calcular a coreness para cada nó na rede
 coreness_values <- coreness(rede)
 
-# Encontrar o número total de conchas (shells) na rede
+# encontrar o número total de conchas (shells) na rede
 (num_conchas <- max(coreness_values))
 
-# Contagem de nós em cada concha (shell)
+# contagem de nós em cada concha (shell)
 for (i in 1:num_conchas) {
   dimensao_concha <- sum(coreness_values == i)
   print(paste("Número de nós na concha", i, ":", dimensao_concha))
 }
 
+# gráfico de barras com a distribuição de conchas na rede
 
 ggplot(data.frame(coreness_values), aes(x = coreness_values)) +
   geom_bar(stat = "count", fill = "orange") +
@@ -170,7 +141,7 @@ ggplot(data.frame(coreness_values), aes(x = coreness_values)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   scale_x_continuous(breaks = 1:num_conchas)
-ggsave("Imagens/distribuicao_conchas_rede.svg")
+ggsave("Imagens/distribuicao_conchas_rede.svg") # guardar gráfico num svg
 
 # percentagem de nos em cada concha
 
@@ -178,16 +149,6 @@ for (i in 1:num_conchas) {
   dimensao_concha <- sum(coreness_values == i)
   print(paste("Percentagem de nós na concha", i, ":", (dimensao_concha / vcount(rede)) * 100))
 }
-
-# grafico circular com a percentagem de nos em cada concha
-
-ggplot(data.frame(coreness_values), aes(x = coreness_values)) +
-  geom_bar(stat = "count", fill = "orange") +
-  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, size = 3) +
-  labs(x = "Concha", y = "Número de nós", title = "Distribuição de Conchas na Rede") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  scale_x_continuous(breaks = 1:num_conchas)
 
 
 data <- data.frame(
@@ -199,12 +160,10 @@ for (i in 1:num_conchas) {
   data$percentagem[i] <- round((sum(coreness_values == i) / vcount(rede)) * 100, 2)
 }
 
-# grafico circular com as percentagens como legenda
-
-
-
+# excluir as conchas com 0% de nós
 data_filtered <- subset(data, percentagem != 0)
 
+# gráfico circular com a percentagem de nós em cada concha
 ggplot(data = data_filtered, aes(x = "", y = percentagem, fill = factor(concha))) +
   geom_bar(stat = "identity", width = 1, color = "white") +
   coord_polar("y", start = 0) +
@@ -212,7 +171,7 @@ ggplot(data = data_filtered, aes(x = "", y = percentagem, fill = factor(concha))
   theme_void() +
   theme(legend.position = "right") +
   geom_text(aes(label = paste0(round(percentagem,1), "%")), position = position_stack(vjust = 0.5), angle = 60)
-ggsave("Imagens/percentagem_conchas_rede.svg")
+ggsave("Imagens/percentagem_conchas_rede.svg") # guardar gráfico num svg
 
 
 
@@ -248,16 +207,30 @@ plot(componente_gigante, vertex.size = 7, vertex.label.cex = .35)
 (ligacoes_componente <- ecount(componente_gigante))
 
 # densidade da componente gigante
+edge_density(componente_gigante, loops = FALSE)
 
-round(graph.density(componente_gigante),3)
+
 
 # grau medio da componente gigante
 
 mean(degree(componente_gigante))
 
 # distribuicao de graus da componente gigante
+(degree_dist_cg <- round(degree_distribution(componente_gigante), 2))
 
-degree_distribution(componente_gigante)
+# cria um data frame com os graus e suas proporções
+(degree_df_cg <- data.frame(Grau = 0:(length(degree_dist_cg)-1), Proporcao = degree_dist_cg))
+
+
+# gráfico de barras com a distribuição de graus na componente gigante
+ggplot(degree_df_cg, aes(x = factor(Grau), y = Proporcao)) +
+  geom_bar(stat = "identity", fill = "orange") +
+  geom_text(aes(label = Proporcao), vjust = -0.5, size = 3) +
+  labs(x = "Grau", y = "Proporção", title = "Distribuição de Grau na Componente Gigante") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+ggsave("Imagens/distribuicao_grau_componente_gigante.svg") # guardar o gráfico num svg
 
 
 # Estudo da associação de grau da componente gigante
@@ -265,10 +238,9 @@ degree_distribution(componente_gigante)
 assortativity_degree(componente_gigante)
 
 # media caminhos mais curtos da componente gigante
-
 mean_distance(componente_gigante)
 
-
+# logaritmo para averiguar se a distância média é pequena
 log10(vcount(componente_gigante))
 
 # Desta forma, pode-se concluir que a distância média não é pequena,
@@ -290,27 +262,28 @@ diameter(componente_gigante)
 # Estudo e caracterização da existência de triângulos na rede
 
 
+# coeficiente de clustering da rede
 transitivity(componente_gigante, type = "global")
 
-# Obter a matriz de adjacência
-adj_matrix <- as.matrix(get.adjacency(componente_gigante))
 
-# Calcular o número de triângulos fechados
+# calcula o número de triângulos fechados
+(numero_triangulos_cg <- sum(count_triangles(componente_gigante)))
 
-(num_closed_triangles <- sum(diag(adj_matrix %*% adj_matrix %*% adj_matrix)) / 2)
-
+# calcula a percentagem do número de triângulos da compononente gigante 
+# em relação ao número de triângulos da rede
+(percentagem_triangulos_cg <- round((numero_triangulos_cg / numero_triangulos_rede) * 100, 1))
 
 # Parâmetro de heterogeneidade
 
-graus <- degree(componente_gigante)
-
-deg <- degree(componente_gigante, mode="all")
-
-hist(deg, breaks=seq(0, max(deg)+1, by=1), col="blue", xlab="Grau", ylab="Frequência", main="Distribuição de graus")
-plot(deg, pch=20, col="blue", cex=2, xlab="Grau", ylab="Frequência", main="Distribuição de graus")
 
 
-(ht <- mean(deg^2) / mean(deg)^2)
+deg_cg <- degree(componente_gigante, mode="all")
+
+hist(deg_cg, breaks=seq(0, max(deg_cg)+1, by=1), col="blue", xlab="Grau", ylab="Frequência", main="Distribuição de graus")
+plot(deg_cg, pch=20, col="blue", cex=2, xlab="Grau", ylab="Frequência", main="Distribuição de graus")
+
+
+(ht_cg <- mean(deg_cg^2) / mean(deg_cg)^2)
 
 
 
@@ -326,17 +299,58 @@ coeficiente_variacao <- desvio_padrao_graus / media_graus
 print(coeficiente_variacao)
 
 
-# Calcular a coreness para cada nó na rede
+# calcular a coreness para cada nó na rede
 coreness_values <- coreness(componente_gigante)
 
-# Encontrar o número total de conchas (shells) na rede
+# encontrar o número total de conchas (shells) na rede
 (num_conchas <- max(coreness_values))
 
-# Contagem de nós em cada concha (shell)
+# contagem de nós em cada concha (shell)
 for (i in 1:num_conchas) {
   dimensao_concha <- sum(coreness_values == i)
   print(paste("Número de nós na concha", i, ":", dimensao_concha))
 }
+
+ggplot(data.frame(coreness_values), aes(x = coreness_values)) +
+  geom_bar(stat = "count", fill = "orange") +
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.5, size = 3) +
+  labs(x = "Concha", y = "Número de nós", title = "Distribuição de Conchas na Componente Gigante") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  scale_x_continuous(breaks = 1:num_conchas)
+ggsave("Imagens/distribuicao_conchas_componente_gigante.svg")
+
+for (i in 1:num_conchas) {
+  dimensao_concha <- sum(coreness_values == i)
+  print(paste("Percentagem de nós na concha", i, ":", (dimensao_concha / vcount(componente_gigante)) * 100))
+}
+
+
+data_cg <- data.frame(
+  concha = 1:num_conchas,
+  percentagem = NA
+)
+
+for (i in 1:num_conchas) {
+  data_cg$percentagem[i] <- round((sum(coreness_values == i) / vcount(componente_gigante)) * 100, 2)
+}
+
+# grafico circular com as percentagens como legenda
+
+
+
+data_filtered_cg <- subset(data_cg, percentagem != 0)
+
+ggplot(data = data_filtered_cg, aes(x = "", y = percentagem, fill = factor(concha))) +
+  geom_bar(stat = "identity", width = 1, color = "white") +
+  coord_polar("y", start = 0) +
+  labs(title = "Percentagem de nós em cada concha na Componente Gigante", fill = "Concha") +
+  theme_void() +
+  theme(legend.position = "right") +
+  geom_text(aes(label = paste0(round(percentagem,1), "%")), position = position_stack(vjust = 0.5), angle = 60)
+ggsave("Imagens/percentagem_conchas_componente_gigante.svg")
+
+
 
 
 plot(componente_gigante, vertex.size=5, vertex.label=NA, edge.arrow.size=0.5, 
