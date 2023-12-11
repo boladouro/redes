@@ -338,9 +338,10 @@ for (i in 1:num_conchas) {
 # grafico circular com as percentagens como legenda
 
 
-
+# excluir as conchas com 0% de nós
 data_filtered_cg <- subset(data_cg, percentagem != 0)
 
+# gráfico circular com a percentagem de nós em cada concha
 ggplot(data = data_filtered_cg, aes(x = "", y = percentagem, fill = factor(concha))) +
   geom_bar(stat = "identity", width = 1, color = "white") +
   coord_polar("y", start = 0) +
@@ -349,15 +350,5 @@ ggplot(data = data_filtered_cg, aes(x = "", y = percentagem, fill = factor(conch
   theme(legend.position = "right") +
   geom_text(aes(label = paste0(round(percentagem,1), "%")), position = position_stack(vjust = 0.5), angle = 60)
 ggsave("Imagens/percentagem_conchas_componente_gigante.svg")
-
-
-
-
-plot(componente_gigante, vertex.size=5, vertex.label=NA, edge.arrow.size=0.5, 
-     edge.curved=0.2, edge.color="gray", vertex.color="blue", vertex.frame.color="white", 
-     vertex.label.color="black", layout=layout.fruchterman.reingold, main="Componente Gigante")
-
-
-
 
 
