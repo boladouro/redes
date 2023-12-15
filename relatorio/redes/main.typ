@@ -68,10 +68,10 @@ O grau de um nodo $i$ de uma rede não orientada é o número de ligações inci
 A densidade é uma medida relativa que relaciona o número de ligações existentes numa rede com o número máximo possível de ligações. Como a rede é não orientada, esta pode ser calculada por $d = (2L)/N(N-1)$.   
 
 
-Pela inspeção visual da representação gráfica da rede apresentada na Introdução pode-se constatar que é uma rede de dimensões consideráveis e não se conseguindo identificar os caminhos a olho nu. Isto pode ser corroborado pelo número de vértices da rede que são 787 e o número de arestas que são 1197.
+Pela inspeção visual da representação gráfica da rede apresentada na _Introdução_ pode-se constatar que é uma rede de dimensões consideráveis, não se conseguindo identificar os caminhos a olho nu. Isto pode ser corroborado pelo número de vértices da rede que são 787 e o número de arestas que são 1197.
 
 
-Relativamente ao grau médio $grau = 3.041931$, significa que, em média, cada nodo está ligado a aproximadamente 3 nodos. No contexto do problema, significa que cada habitante na zona residencial está diretamente conectado a cerca de 3 outros habitantes através de contatos sociais diretos, representados na rede.
+Relativamente ao grau médio $grau = 3.041931$, significa que, em média, cada nodo está ligado a aproximadamente 3 nodos. No contexto do problema, significa que cada habitante na zona residencial está diretamente conectado a cerca de 3 outros habitantes através de contacctos sociais diretos, representados na rede.
 
 
 Quanto à densidade, obteve-se o valor de 0.003870142, um valor muito inferior a 1, pelo que a rede é esparsa. Desta forma, existe apenas uma pequena fração do número total de conexões possível entre os habitantes que está realmente representada na rede. Além disso, pode indicar também a presença de subgrupos ou comunidades dentro da sua zona residencial que têm poucos contactos fora dos seus grupos, resultando nessa densidade reduzida na rede global.
@@ -91,7 +91,7 @@ Dela pode retirar-se que:
 - *Grau 3*: Cerca de 13% dos habitantes têm três contactos diretos sociais na rede.
 - *Graus mais elevados*: À medida que o grau aumenta, a proporção de habitantes com esse grau diminui significativamente, indicando que é menos comum ter um número maior de contactos sociais diretos na rede.
 - *Predominância de graus baixos*: A maior parte dos habitantes possui poucos contactos sociais diretos na rede, sugerindo uma rede onde a maioria dos habitantes possui um número limitado de conexões. Além disso, a concentração em graus mais baixos sugere a presença de grupos onde a interação é mais restrita.
-- *Poucos Indivíduos Altamente Conectados*: A proporção diminui rapidamente à medida que o grau aumenta, indicando que há poucos indivíduos com muitos contatos diretos na rede.
+- *Poucos Indivíduos Altamente Conectados*: A proporção diminui rapidamente à medida que o grau aumenta, indicando que há poucos indivíduos com muitos ccontactos diretos na rede.
 
 
 De seguida, averiguar-se-á se a rede é conexa e, caso não seja, será indicado o número de componentes conexas e as dimensões mínima e máxima das componentes conexas.
@@ -101,8 +101,8 @@ Constatamos que a rede possui três componentes conectadas distintas, sendo que 
 A variação considerável nos tamanhos das componentes, sugere que alguns grupos podem ser muito pequenos, enquanto outros podem representar uma parte significativa da população da zona residencial.
 
 
-A associação de grau é 0.4765607, e, sendo positiva, há uma tendência para nodos com características semelhantes se conectarem, sugerindo que pessoas com características semelhantes têm uma chance maior de estabelecer contatos sociais diretos entre si. 
-A média dos comprimentos dos caminhos mais curtos é  7.914034, o que significa que, em média, dois habitantes quaisquer na zona residencial estão conectados por um caminho de 7.914 unidades na rede de contatos sociais diretos.
+A associação de grau é 0.4765607, e, sendo positiva, há uma tendência para nodos com características semelhantes se conectarem, sugerindo que pessoas com características semelhantes têm uma chance maior de estabelecer ccontactos sociais diretos entre si. 
+A média dos comprimentos dos caminhos mais curtos é  7.914034, o que significa que, em média, dois habitantes quaisquer na zona residencial estão conectados por um caminho de 7.914 unidades na rede de ccontactos sociais diretos.
 Uma distância média é pequena se cresce muito lentamente com o número de nodos da rede.
 
 De forma a permitir avaliar se a distância média é pequena, recorremos a $log_10 (N)$, que é uma função que cresce muito lentamente e caso este último cálculo seja próximo da distância média então considera-se pequena.
@@ -161,7 +161,7 @@ Nesta questão pretende-se fazer uma análise análoga à anterior, mas desta ve
 
 Desta subrede resultou uma rede com 496 nodos e com 327 ligações.
 
-O grau médio obtido, $grau$, é de 3.967742, o que significa que, em média, aproximadamente, cada nodo está ligado a outros quatro nodos. Neste problema, representa que cada habitante na zona residencial está diretamente conectado a cerca de 4 outros habitantes através de contatos sociais diretos, representados na componente gigante.
+O grau médio obtido, $grau$, é de 3.967742, o que significa que, em média, aproximadamente, cada nodo está ligado a outros quatro nodos. Neste problema, representa que cada habitante na zona residencial está diretamente conectado a cerca de 4 outros habitantes através de ccontactos sociais diretos, representados na componente gigante.
 
 
 Quanto à densidade obtivemos o valor de 0.008, o que era espectável, tendo em conta que a compontente gigante representa a componente com mais conexões e como tal será mais densa. Contudo, continua a ser inferior a 1 e muito próxima de 0, pelo que esta subrede é muito esparsa.
@@ -182,10 +182,10 @@ Do gráfico pode analisar-se que:
 - *Grau 4*: Cerca de 12% dos habitantes têm três contactos diretos sociais na subrede.
 - *Graus mais elevados*: À medida que o grau aumenta, a proporção de habitantes com esse grau diminui significativamente, indicando que é menos comum ter um número maior de contactos sociais diretos na componente gigante.
 - *Predominância de número de contactos sociais até 4*: A maior parte das pessoas tem no máximo 4 contactos sociais dentro da sua área residencial, na componente gigante.
-- *Poucos Indivíduos Altamente Conectados*: A proporção diminui rapidamente à medida que o grau aumenta, indicando que há poucos indivíduos com muitos contatos diretos na subrede.
+- *Poucos Indivíduos Altamente Conectados*: A proporção diminui rapidamente à medida que o grau aumenta, indicando que há poucos indivíduos com muitos ccontactos diretos na subrede.
 
 
-Relativamente à associação de grau, esta é de 0.345145, e, sendo positiva e um valor um pouco baixo, existe alguma tendência para nodos com características semelhantes se conectarem, sugerindo que pessoas com características semelhantes têm uma chance maior de estabelecer contatos sociais diretos entre si. A média de comprimento dos caminhos mais curtos é 7.933447, representando que, em média, dois habitantes quaisquer na zona residencial estão conectados por um caminho de 7.93 unidades na componente gigante.
+Relativamente à associação de grau, esta é de 0.345145, e, sendo positiva e um valor um pouco baixo, existe alguma tendência para nodos com características semelhantes se conectarem, sugerindo que pessoas com características semelhantes têm uma chance maior de estabelecer ccontactos sociais diretos entre si. A média de comprimento dos caminhos mais curtos é 7.933447, representando que, em média, dois habitantes quaisquer na zona residencial estão conectados por um caminho de 7.93 unidades na componente gigante.
 
 Quanto à avaliação da distância média ser pequena, temos o seguinte:
 
@@ -262,7 +262,7 @@ Comparando o *tamanho* e a *densidade*, a rede original tem todos os nós e cone
 Relativamente à *distribuição de graus*, a rede e a componente gigante possuem concentração em graus mais baixos.
 
 
-Tanto para a rede como para a componente gigante, a *associação* é positiva e significativa, pelo que nodos com características semelhantes têm tendência a se conectarem, isto é, pessoas com características semelhantes têm uma chance maior de estabelecer contatos sociais diretos entre si.
+Tanto para a rede como para a componente gigante, a *associação* é positiva e significativa, pelo que nodos com características semelhantes têm tendência a se conectarem, isto é, pessoas com características semelhantes têm uma chance maior de estabelecer ccontactos sociais diretos entre si.
 
 Quanto ao *diâmetro* e à *distância média*, o diâmetro é o mesmo para ambas, contudo, a distância média é mais pequena na componente gigante, refletindo a maior coesão e conectividade nessa subrede. É de realçar que tanto para a rede como a subrede, a distância média não é pequena.
 

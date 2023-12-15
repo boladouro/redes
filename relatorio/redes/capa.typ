@@ -43,19 +43,19 @@
 }
 
 #par(leading: 0.3cm)[
-  #text(20pt)[Allan Kardec Rodrigues, 103380]\
+  #text(20pt)[Allan Kardec Rodrigues, 103380, CDC1]\
   #link("mailto:aksrs@iscte-iul.pt")
   #v(0.12cm)
-  #text(20pt)[André Plancha, 105289]\
+  #text(20pt)[André Plancha, 105289, CDC2]\
   #link("mailto:Andre_Plancha@iscte-iul.pt")[Andre_Plancha\@iscte-iul.pt]\
   #v(0.12cm)
-  #text(20pt)[Diogo Freitas, 104841]\
+  #text(20pt)[Diogo Freitas, 104841, CDC1]\
   #link("mailto:daafs@iscte-iul.pt")
   #v(0.12cm)
-  #text(20pt)[João Francisco Botas, 104782]\
+  #text(20pt)[João Francisco Botas, 104782, CDC1]\
   #link("mailto:Joao_Botas@iscte-iul.pt")
   #v(0.12cm)
-  #text(20pt)[Marco Esperança, 110451]\
+  #text(20pt)[Marco Esperança, 110451, CDC1]\
   #link("mailto:mdeao@iscte-iul.pt")
 ]
 #if indice {
@@ -64,7 +64,7 @@
   v(4.5cm)
 }
 #par(leading: 0.2cm)[
-  #text(16pt)[10 de novembro 2023]\
+  #text(16pt)[15 de dezembro 2023]\
   #text(16pt)[Versão 1.0.0]
 ]
 #v(3cm)
