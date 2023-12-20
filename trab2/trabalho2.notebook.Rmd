@@ -9,7 +9,7 @@ library(conflicted)
 library(magrittr)
 library(icecream)
 library(restorepoint)
-
+library(tibble)
 ```
 
 Clique com 10 nodos
@@ -27,13 +27,13 @@ get_neighbors <- function(graph, node) {
 
 # 0 <= p <= 1
 # 1 <= n_ligacoes
-random_walk_model_iter <- function(graph, p = 0.8, n_ligacoes = 3,debug_ = T, i = NULL) {
+random_walk_model_iter <- function(graph, p = 0.8, n_ligacoes = 3,debug_ = F, i = FALSE) {
   if(debug_) {
     ic_enable()
   } else {
     ic_disable()
   }
-  if (i %>% is.null() %>% isFALSE()) {
+  if (isFALSE(i)) {
     restore.point(paste0("iter_",i), to.global = TRUE)
   }
   graph %<>% add_vertices(1)
@@ -68,7 +68,7 @@ random_walk_model_iter <- function(graph, p = 0.8, n_ligacoes = 3,debug_ = T, i 
   graph
 }
 set.seed(1)
-g %>% random_walk_model_iter() %>%  plot()
+g %>% random_walk_model_iter(debug_ = T) %>%  plot()
 ```
 
 Nota: não me foi claro se ao rejeitar o vizinho:
@@ -78,126 +78,79 @@ Nota: não me foi claro se ao rejeitar o vizinho:
 Se for a segunda, começar com um clique parece impossivel, portanto decidi a primeira.
 
 ```{r}
-set.seed(1)
-g_dps <- g
-# iterate until 200 nodes
-for (i in 1:(200 - vcount(g))) {
-  g_dps %<>% random_walk_model_iter(debug_ = F, i = i)
+random_walk_model <- function(g, nodes_wanted = 200, p = 0.8, n_ligacoes = 3, debug_ = F, seed = 1) {
+  set.seed(seed)
+  for (i in 1:(nodes_wanted - vcount(g))) {
+    g %<>% random_walk_model_iter(p = p, n_ligacoes = n_ligacoes, i = ifelse(debug_, i, FALSE))
+  }
+  # metrics
+  metrics <- calculate_metrics(g)
+  g
 }
+g_dps <- g %>% random_walk_model()
 ic_enable()
 ic(vcount(g_dps) == 200)
 ic(is.simple(g_dps))
-ecount(g_dps) == 190*3 + ecount(g) |> ic()
+ic(ecount(g_dps) == (200-vcount(g))*3 + ecount(g))
 g_dps %>% plot(vertex.size = 7, vertex.label.cex = 0.35)
 ```
 
 ```{r}
-# fazer 10 redes com isto agr
-set.seed(1)
-graphs <- list()
-for (i in 1:10) {
-  g_dps <- g
-  for (j in 1:(200 - vcount(g))) {
-    g_dps %<>% random_walk_model_iter(debug_ = F, i = j)
+# o que esta em cima mas funcao
+make_graphs <- function(initial_g, how_many, nodes_wanted = 200, p = 0.8, n_ligacoes = 3, debug_ = F, seed = 1) {
+  set.seed(seed)
+  graphs <- list()
+  for (i in 1:how_many) {
+    g_dps <- initial_g
+    for (j in 1:(nodes_wanted - vcount(initial_g))) {
+      g_dps %<>% random_walk_model_iter(p = p, n_ligacoes = n_ligacoes, i = ifelse(debug_, j, FALSE))
+    }
+    graphs[[i]] <- g_dps
   }
-  graphs[[i]] <- g_dps
+  graphs
 }
-```
-
-```{r}
+make_graphs(g, 10) -> graphs
 graphs[[7]] %>% plot
 ```
 
 
 ```{r}
-library(tibble)
-
-# Função para calcular as métricas
 calculate_metrics <- function(graph) {
   mean_distance <- mean_distance(graph, directed = FALSE, unconnected = TRUE)
   clustering_coef <- transitivity(graph, type = "global")
   deg <- degree(graph, mode = "all")
   ht <- mean(deg^2)/mean(deg)^2
   
-  return(tibble(
+  tibble(
     Mean_Distance = mean_distance,
     Clustering_Coefficient = clustering_coef,
     Heterogeneity = ht
-  ))
+  )
+}
+calculate_metrics_graphs <- function(graphs) {
+  lapply(graphs, calculate_metrics) -> results
+  tibble(
+    Rede = 1:length(graphs),
+    Distancia_Media = sapply(results, \(x) x$Mean_Distance),
+    Coeficiente_de_Clustering = sapply(results, \(x) x$Clustering_Coefficient),
+    Heterogeneidade = sapply(results, \(x) x$Heterogeneity)
+  )
 }
 
-# Calculando métricas para cada rede
-metrics <- lapply(graphs, calculate_metrics)
-
-# Criando uma tabela com os resultados
-results_table <- tibble(
-  Rede = 1:length(graphs),
-  Distancia_Media = sapply(metrics, function(x) x$Mean_Distance),
-  Coeficiente_de_Clustering = sapply(metrics, function(x) x$Clustering_Coefficient),
-  Heterogeneidade = sapply(metrics, function(x) x$Heterogeneity)
-)
-
-results_table
-
+calculate_metrics_graphs(graphs)
 ```
 
-Clique com 20 nodos
+
+Agr a mesma coisa com 20 nodos
 
 ```{r}
 graph.full(20, directed = F) -> g2
-
-g2 |> plot()
-```
-
-
-
-```{r}
-set.seed(1)
-g2 %>% random_walk_model_iter() %>%  plot()
-```
-```{r}
-set.seed(1)
-g_dps2 <- g2
-# iterate until 200 nodes
-for (i in 1:(200 - vcount(g2))) {
-  g_dps2 %<>% random_walk_model_iter(debug_ = F, i = i)
-}
-ic_enable()
-ic(vcount(g_dps2) == 200)
-ic(is.simple(g_dps2))
-ecount(g_dps2) == 190*3 + ecount(g2) |> ic()
-g_dps2 %>% plot(vertex.size = 7, vertex.label.cex = 0.35)
-```
-```{r}
-# fazer 10 redes com isto agr
-set.seed(1)
-graphs <- list()
-for (i in 1:10) {
-  g_dps2 <- g2
-  for (j in 1:(200 - vcount(g2))) {
-    g_dps2 %<>% random_walk_model_iter(debug_ = F, i = j)
-  }
-  graphs[[i]] <- g_dps2
-}
-```
-
-```{r}
-graphs[[7]] %>% plot
+g2 %>% plot()
 ```
 
 
 ```{r}
-# Calculando métricas para cada rede
-metrics2 <- lapply(graphs, calculate_metrics)
-
-# Criando uma tabela com os resultados
-results_table2 <- tibble(
-  Rede = 1:length(graphs),
-  Distancia_Media = sapply(metrics, function(x) x$Mean_Distance),
-  Coeficiente_de_Clustering = sapply(metrics, function(x) x$Clustering_Coefficient),
-  Heterogeneidade = sapply(metrics, function(x) x$Heterogeneity)
-)
-
-results_table2
+make_graphs(g2, 10, seed = 1) -> graphs2
+calculate_metrics_graphs(graphs2)
 ```
 
