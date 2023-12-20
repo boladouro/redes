@@ -1,0 +1,124 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(igraph)
+library(conflicted)
+library(magrittr)
+library(icecream)
+library(restorepoint)
+
+```
+
+```{r}
+graph.full(10, directed = F) -> g
+g |> plot()
+```
+
+```{r}
+get_neighbors <- function(graph, node) {
+  # dps n da pra faer vetor deles se n fizer isto
+  neighbors(graph, node) %>% as.integer()
+}
+
+# 0 <= p <= 1
+# 1 <= n_ligacoes
+random_walk_model_iter <- function(graph, p = 0.8, n_ligacoes = 3,debug_ = T, i = NULL) {
+  if(debug_) {
+    ic_enable()
+  } else {
+    ic_disable()
+  }
+  if (i %>% is.null() %>% isFALSE()) {
+    restore.point(paste0("iter_",i), to.global = TRUE)
+  }
+  graph %<>% add_vertices(1)
+  # vars
+  nodo_ligado      <- sample(1:(vcount(graph) - 1), 1)
+  ic(nodo_ligado)
+  nodo_novo        <- vcount(graph)
+  ic(nodo_novo)
+  
+
+  neighbors_de_ligado <- get_neighbors(graph, nodo_ligado)
+  ic(neighbors_de_ligado)
+  graph %<>% add_edges(c(nodo_novo, nodo_ligado))
+  
+  # dps de ter o primeiro link, comecar o loop
+  for (i in 2:n_ligacoes) {
+    ic(i)
+    # escolher um vizinho do nodo ligado (ainda não escolhido)
+    nodo_para_aceitar <- setdiff(neighbors_de_ligado, get_neighbors(graph, nodo_novo)) %>% sample(1)
+    ic(nodo_para_aceitar)
+    u <- ic(runif(1))
+    if(ic(u < p)) { # aceitar o vizinho
+      graph %<>% add_edges(c(nodo_para_aceitar %>% as.integer(), nodo_novo))
+    } else { # escolher outro sem ser o vizinho escolhido (ver nota)
+      nodo_para_ligar <- 1:vcount(graph) %>%  
+        # todos excepto o rejeitado, os já ligados e o próprio nodo novo
+        setdiff(c(nodo_para_aceitar, get_neighbors(graph, nodo_novo), nodo_novo)) %>% 
+        sample(1)
+      graph %<>% add_edges(c(nodo_para_ligar, nodo_novo))
+    }
+  }
+  graph
+}
+set.seed(1)
+g %>% random_walk_model_iter() %>%  plot()
+```
+
+Nota: não me foi claro se ao rejeitar o vizinho:
+- outro qualquer pode ser escolhido excepto o vizinho escolhido
+- outro qualquer pode ser escolhido desde que não seja vizinho
+
+Se for a segunda, começar com um clique parece impossivel, portanto decidi a primeira.
+
+```{r}
+set.seed(1)
+g_dps <- g
+# iterate until 200 nodes
+for (i in 1:(200 - vcount(g))) {
+  g_dps %<>% random_walk_model_iter(debug_ = F, i = i)
+}
+ic_enable()
+ic(vcount(g_dps) == 200)
+ic(is.simple(g_dps))
+ecount(g_dps) == 190*3 + ecount(g) |> ic()
+g_dps %>% plot(vertex.size = 7, vertex.label.cex = 0.35)
+```
+
+```{r}
+# fazer 10 redes com isto agr
+set.seed(1)
+graphs <- list()
+for (i in 1:10) {
+  g_dps <- g
+  for (j in 1:(200 - vcount(g))) {
+    g_dps %<>% random_walk_model_iter(debug_ = F, i = j)
+  }
+  graphs[[i]] <- g_dps
+}
+```
+
+```{r}
+graphs[[7]] %>% plot
+```
+
+```{r}
+mean_dist <- \(x) mean_distance(x)
+trans <-\(x) transitivity(x, type = "global")
+deg <- \(x) degree(x, mode = "all")
+heterogeneidade <- \(x) mean(deg(x)^2)/mean(deg(x))^2
+# distancia media,coeficiente de clustering    , heterogeneidade 
+
+# apply to all
+tribble(~`Distância Média`, ~`Coeficiente de Clustering`, ~Heterogeneidade) %>% as.data.frame() -> df
+
+lapply(1:(length(graphs)), function (i) {
+  df %<>% rbind(mean_dist(graphs[[i]]), trans(graphs[[i]]), heterogeneidade(graphs[[i]]))
+})
+df
+```
+

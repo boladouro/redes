@@ -1,4 +1,4 @@
-library(igraph)
+
 
 # Função para gerar uma rede aleatória a partir de uma clique inicial
 gerar_rede_aleatoria <- function(seed) {
