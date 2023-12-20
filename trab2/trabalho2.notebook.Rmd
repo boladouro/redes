@@ -12,6 +12,8 @@ library(restorepoint)
 
 ```
 
+Clique com 10 nodos
+
 ```{r}
 graph.full(10, directed = F) -> g
 g |> plot()
@@ -106,19 +108,96 @@ for (i in 1:10) {
 graphs[[7]] %>% plot
 ```
 
+
 ```{r}
-mean_dist <- \(x) mean_distance(x)
-trans <-\(x) transitivity(x, type = "global")
-deg <- \(x) degree(x, mode = "all")
-heterogeneidade <- \(x) mean(deg(x)^2)/mean(deg(x))^2
-# distancia media,coeficiente de clustering    , heterogeneidade 
+library(tibble)
 
-# apply to all
-tribble(~`Distância Média`, ~`Coeficiente de Clustering`, ~Heterogeneidade) %>% as.data.frame() -> df
+# Função para calcular as métricas
+calculate_metrics <- function(graph) {
+  mean_distance <- mean_distance(graph, directed = FALSE, unconnected = TRUE)
+  clustering_coef <- transitivity(graph, type = "global")
+  deg <- degree(graph, mode = "all")
+  ht <- mean(deg^2)/mean(deg)^2
+  
+  return(tibble(
+    Mean_Distance = mean_distance,
+    Clustering_Coefficient = clustering_coef,
+    Heterogeneity = ht
+  ))
+}
 
-lapply(1:(length(graphs)), function (i) {
-  df %<>% rbind(mean_dist(graphs[[i]]), trans(graphs[[i]]), heterogeneidade(graphs[[i]]))
-})
-df
+# Calculando métricas para cada rede
+metrics <- lapply(graphs, calculate_metrics)
+
+# Criando uma tabela com os resultados
+results_table <- tibble(
+  Rede = 1:length(graphs),
+  Distancia_Media = sapply(metrics, function(x) x$Mean_Distance),
+  Coeficiente_de_Clustering = sapply(metrics, function(x) x$Clustering_Coefficient),
+  Heterogeneidade = sapply(metrics, function(x) x$Heterogeneity)
+)
+
+results_table
+
+```
+
+Clique com 20 nodos
+
+```{r}
+graph.full(20, directed = F) -> g2
+
+g2 |> plot()
+```
+
+
+
+```{r}
+set.seed(1)
+g2 %>% random_walk_model_iter() %>%  plot()
+```
+```{r}
+set.seed(1)
+g_dps2 <- g2
+# iterate until 200 nodes
+for (i in 1:(200 - vcount(g2))) {
+  g_dps2 %<>% random_walk_model_iter(debug_ = F, i = i)
+}
+ic_enable()
+ic(vcount(g_dps2) == 200)
+ic(is.simple(g_dps2))
+ecount(g_dps2) == 190*3 + ecount(g2) |> ic()
+g_dps2 %>% plot(vertex.size = 7, vertex.label.cex = 0.35)
+```
+```{r}
+# fazer 10 redes com isto agr
+set.seed(1)
+graphs <- list()
+for (i in 1:10) {
+  g_dps2 <- g2
+  for (j in 1:(200 - vcount(g2))) {
+    g_dps2 %<>% random_walk_model_iter(debug_ = F, i = j)
+  }
+  graphs[[i]] <- g_dps2
+}
+```
+
+```{r}
+graphs[[7]] %>% plot
+```
+
+
+```{r}
+# Calculando métricas para cada rede
+metrics2 <- lapply(graphs, calculate_metrics)
+
+# Criando uma tabela com os resultados
+results_table2 <- tibble(
+  Rede = 1:length(graphs),
+  Distancia_Media = sapply(metrics, function(x) x$Mean_Distance),
+  Coeficiente_de_Clustering = sapply(metrics, function(x) x$Clustering_Coefficient),
+  Heterogeneidade = sapply(metrics, function(x) x$Heterogeneity)
+)
+
+results_table2
 ```
 
