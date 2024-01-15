@@ -75,6 +75,30 @@ random_walk_model <- function(g, nodes_wanted = 200, p = 0.8, n_ligacoes = 3, de
   }
   g
 }
+
+random_walk_model_w_stats <- function(g, nodes_wanted = 200, p = 0.8, n_ligacoes = 3, debug_ = F, seed = 1) {
+  set.seed(seed)
+  metricas <- tribble(~iter, ~distancias,  ~coef_clustering, ~triangulos)
+  for (i in 1:(nodes_wanted - vcount(g))) {
+    g %<>% random_walk_model_iter(p = p, n_ligacoes = n_ligacoes, i = ifelse(debug_, i, FALSE))
+    metricas %<>% add_row(tibble(
+      iter = i, 
+      distancias = mean_distance(g), 
+      coef_clustering = transitivity(g, type = "global"),
+      triangulos = sum(count_triangles(g))
+    ))
+  }
+  
+  list(graph = g, metricas = metricas)
+}
+
+
+tab <- random_walk_model_w_stats(g, 200, 0.8, 3, T, 1)
+tab
+ggplot(tab$metricas, aes(x = iter, y = distancias)) + geom_point()
+ggplot(tab$metricas, aes(x = iter, y = coef_clustering)) + geom_point()
+ggplot(tab$metricas, aes(x = iter, y = triangulos)) + geom_point()
+
 g_dps <- g %>% random_walk_model()
 ic_enable()
 ic(vcount(g_dps) == 200)
@@ -87,16 +111,26 @@ g_dps %>% plot(vertex.size = 7, vertex.label.cex = 0.35)
 
 # o que esta em cima mas funcao
 # Gerar o número de redes desejado (how_many) com determinado nº nodos (nodes_wanted - 200)
-make_graphs <- function(initial_g, how_many, nodes_wanted = 200, p = 0.8, n_ligacoes = 3, debug_ = F, seed = 1) {
+make_graphs <- function(initial_g, how_many, nodes_wanted = 200, p = 0.8, n_ligacoes = 3, debug_ = FALSE, seed = 1) {
   set.seed(seed)
   graphs <- list()
+  avg_distances <- numeric(how_many)  # Armazena as distâncias médias
+  
   for (i in 1:how_many) {
     g_dps <- initial_g
+    distances <- numeric(nodes_wanted - vcount(initial_g))
+    
     for (j in 1:(nodes_wanted - vcount(initial_g))) {
       g_dps %<>% random_walk_model_iter(p = p, n_ligacoes = n_ligacoes, i = ifelse(debug_, j, FALSE))
+
     }
+    
+
     graphs[[i]] <- g_dps
   }
+  
+  # Plotar a evolução da distância média
+  
   graphs
 }
 make_graphs(g, 10) -> graphs
@@ -161,6 +195,7 @@ vcount(componente_gigante)
 ecount(componente_gigante)
 
 
+# grau medio
 
 
 ## Identificação de comunidades através da remoção de pontes
