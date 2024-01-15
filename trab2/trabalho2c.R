@@ -175,6 +175,13 @@ make_graphs(g2, 10, seed = 1) -> graphs2
 calculate_metrics_graphs(graphs2)
 
 
+tab2 <- random_walk_model_w_stats(g2, 200, 0.8, 3, T, 1)
+tab2
+ggplot(tab2$metricas, aes(x = iter, y = distancias)) + geom_point()
+ggplot(tab2$metricas, aes(x = iter, y = coef_clustering)) + geom_point()
+ggplot(tab2$metricas, aes(x = iter, y = triangulos)) + geom_point()
+
+
 
 #### Questão 2 ####
 
