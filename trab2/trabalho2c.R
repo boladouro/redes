@@ -172,6 +172,8 @@ calculate_metrics_graphs <- function(graphs) {
 mean(res_clique_inicial_10_nodos$Distancia_Media)
 sd(res_clique_inicial_10_nodos$Distancia_Media)
 
+mean(res_clique_inicial_10_nodos$Coeficiente_de_Clustering)
+sd(res_clique_inicial_10_nodos$Coeficiente_de_Clustering)
 
 ## Clique com 20 nodos
 
@@ -188,6 +190,9 @@ ggsave("rede_clique_inicial_20_nodos.svg")
 (res_clique_inicial_20_nodos <- calculate_metrics_graphs(graphs2))
 mean(res_clique_inicial_20_nodos$Distancia_Media)
 sd(res_clique_inicial_20_nodos$Distancia_Media)
+
+mean(res_clique_inicial_20_nodos$Coeficiente_de_Clustering)
+sd(res_clique_inicial_20_nodos$Coeficiente_de_Clustering)
 
 
 tab2 <- random_walk_model_w_stats(g2, 200, 0.8, 3, T, 1)
