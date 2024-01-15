@@ -95,9 +95,13 @@ random_walk_model_w_stats <- function(g, nodes_wanted = 200, p = 0.8, n_ligacoes
 
 tab <- random_walk_model_w_stats(g, 200, 0.8, 3, T, 1)
 tab
+
 ggplot(tab$metricas, aes(x = iter, y = distancias)) + geom_point()
+ggsave("distancias_rede_clique_inicial_10_nodos.svg")
 ggplot(tab$metricas, aes(x = iter, y = coef_clustering)) + geom_point()
+ggsave("coef_clustering_rede_clique_inicial_10_nodos.svg")
 ggplot(tab$metricas, aes(x = iter, y = triangulos)) + geom_point()
+ggsave("triangulos_rede_clique_inicial_10_nodos.svg")
 
 g_dps <- g %>% random_walk_model()
 ic_enable()
@@ -141,12 +145,14 @@ graphs[[7]] %>% plot(vertex.size = 7, vertex.label.cex = 0.35)
 calculate_metrics <- function(graph) {
   mean_distance <- mean_distance(graph, directed = FALSE, unconnected = TRUE)
   clustering_coef <- transitivity(graph, type = "global")
+  clustering_medio_coef <- mean(transitivity(graph, type = "local"))
   deg <- degree(graph, mode = "all")
   ht <- mean(deg^2)/mean(deg)^2
   
   tibble(
     Mean_Distance = mean_distance,
     Clustering_Coefficient = clustering_coef,
+    Avg_Clustering_Coefficient = clustering_medio_coef,
     Heterogeneity = ht
   )
 }
@@ -156,11 +162,15 @@ calculate_metrics_graphs <- function(graphs) {
     Rede = 1:length(graphs),
     Distancia_Media = sapply(results, \(x) x$Mean_Distance),
     Coeficiente_de_Clustering = sapply(results, \(x) x$Clustering_Coefficient),
+    Coeficiente_de_Clustering_Medio = sapply(results, \(x) x$Avg_Clustering_Coefficient),
     Heterogeneidade = sapply(results, \(x) x$Heterogeneity)
   )
 }
 
-calculate_metrics_graphs(graphs)
+(res_clique_inicial_10_nodos <- calculate_metrics_graphs(graphs))
+
+mean(res_clique_inicial_10_nodos$Distancia_Media)
+sd(res_clique_inicial_10_nodos$Distancia_Media)
 
 
 ## Clique com 20 nodos
@@ -172,14 +182,25 @@ set.seed(1)
 g2 %>% plot()
 
 make_graphs(g2, 10, seed = 1) -> graphs2
-calculate_metrics_graphs(graphs2)
+graphs2[[7]] %>% plot(vertex.size = 7, vertex.label.cex = 0.35)
+ggsave("rede_clique_inicial_20_nodos.svg")
+
+(res_clique_inicial_20_nodos <- calculate_metrics_graphs(graphs2))
+mean(res_clique_inicial_20_nodos$Distancia_Media)
+sd(res_clique_inicial_20_nodos$Distancia_Media)
 
 
 tab2 <- random_walk_model_w_stats(g2, 200, 0.8, 3, T, 1)
 tab2
+
 ggplot(tab2$metricas, aes(x = iter, y = distancias)) + geom_point()
+ggsave("distancias_rede_clique_inicial_20_nodos.svg")
+
 ggplot(tab2$metricas, aes(x = iter, y = coef_clustering)) + geom_point()
+ggsave("coef_clustering_rede_clique_inicial_20_nodos.svg")
+
 ggplot(tab2$metricas, aes(x = iter, y = triangulos)) + geom_point()
+ggsave("triangulos_rede_clique_inicial_20_nodos.svg")
 
 
 
