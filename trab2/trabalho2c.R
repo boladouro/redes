@@ -140,6 +140,21 @@ make_graphs <- function(initial_g, how_many, nodes_wanted = 200, p = 0.8, n_liga
 make_graphs(g, 10) -> graphs
 graphs[[7]] %>% plot(vertex.size = 7, vertex.label.cex = 0.35)
 
+(dist_graus_rede_7 <- table(degree(graphs[[7]])))
+
+(degree_df <- data.frame(table(degree(graphs[[7]]))))
+colnames(degree_df) <- c("Grau", "Frequência")
+degree_df
+
+ggplot(degree_df, aes(x = factor(Grau), y = Frequência)) +
+  geom_bar(stat = "identity", fill = "orange") +
+  geom_text(aes(label = Frequência), vjust = -0.5, size = 3) +
+  labs(x = "Grau", y = "Frequencia", title = "Distribuição de Grau na Rede") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+ggsave("distribuicao_grau_rede_7_clique_10_nodos.svg")
+
+
 
 # calcular as métricas
 calculate_metrics <- function(graph) {
@@ -185,7 +200,23 @@ g2 %>% plot()
 
 make_graphs(g2, 10, seed = 1) -> graphs2
 graphs2[[7]] %>% plot(vertex.size = 7, vertex.label.cex = 0.35)
+
 ggsave("rede_clique_inicial_20_nodos.svg")
+
+(dist_graus_rede_7 <- table(degree(graphs2[[7]])))
+
+(degree_df <- data.frame(table(degree(graphs2[[7]]))))
+colnames(degree_df) <- c("Grau", "Frequência")
+degree_df
+
+ggplot(degree_df, aes(x = factor(Grau), y = Frequência)) +
+  geom_bar(stat = "identity", fill = "orange") +
+  geom_text(aes(label = Frequência), vjust = -0.5, size = 3) +
+  labs(x = "Grau", y = "Frequencia", title = "Distribuição de Grau na Rede") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+ggsave("distribuicao_grau_rede_7_clique_20_nodos.svg")
+
 
 (res_clique_inicial_20_nodos <- calculate_metrics_graphs(graphs2))
 mean(res_clique_inicial_20_nodos$Distancia_Media)
