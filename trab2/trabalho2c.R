@@ -96,10 +96,12 @@ random_walk_model_w_stats <- function(g, nodes_wanted = 200, p = 0.8, n_ligacoes
 tab <- random_walk_model_w_stats(g, 200, 0.8, 3, T, 1)
 tab
 
-ggplot(tab$metricas, aes(x = iter, y = distancias)) + geom_point()
+ggplot(tab$metricas, aes(x = iter, y = distancias)) + geom_point() + ylim(1, 3.5)
 ggsave("distancias_rede_clique_inicial_10_nodos.svg")
-ggplot(tab$metricas, aes(x = iter, y = coef_clustering)) + geom_point()
+
+ggplot(tab$metricas, aes(x = iter, y = coef_clustering)) + geom_point() + ylim(0.2,1)
 ggsave("coef_clustering_rede_clique_inicial_10_nodos.svg")
+
 ggplot(tab$metricas, aes(x = iter, y = triangulos)) + geom_point()
 ggsave("triangulos_rede_clique_inicial_10_nodos.svg")
 
@@ -229,10 +231,10 @@ sd(res_clique_inicial_20_nodos$Coeficiente_de_Clustering)
 tab2 <- random_walk_model_w_stats(g2, 200, 0.8, 3, T, 1)
 tab2
 
-ggplot(tab2$metricas, aes(x = iter, y = distancias)) + geom_point()
+ggplot(tab2$metricas, aes(x = iter, y = distancias)) + geom_point() + ylim(1, 3.5)
 ggsave("distancias_rede_clique_inicial_20_nodos.svg")
 
-ggplot(tab2$metricas, aes(x = iter, y = coef_clustering)) + geom_point()
+ggplot(tab2$metricas, aes(x = iter, y = coef_clustering)) + geom_point() + ylim(0.2,1)
 ggsave("coef_clustering_rede_clique_inicial_20_nodos.svg")
 
 ggplot(tab2$metricas, aes(x = iter, y = triangulos)) + geom_point()
