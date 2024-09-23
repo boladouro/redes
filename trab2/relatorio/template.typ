@@ -1,18 +1,34 @@
 // #import "@preview/algo:0.3.3": algo, i, d, comment, code
-#import "@preview/tablex:0.0.5": vlinex, hlinex
-
+#import "@preview/tablex:0.0.5": vlinex, hlinex, tablex, gridx
+#import "@preview/algo:0.3.3": algo
 #let to = box(width: 8pt, baseline: 10%)[..]
-#let grau = {
-  $#h(-1pt)<#h(0pt)#text(baseline: 0.5pt)[k]#h(0pt)>#h(2pt)$
+
+#let media(it) = {
+  $#h(-1pt)<#h(0pt)#text(baseline: 0.5pt, it)#h(0pt)>#h(1pt)$
 }
 
+#let grau = {
+  $#h(-1pt)<#h(0pt)#text(baseline: 0.5pt)[k]#h(0pt)>#h(1pt)$
+}
+#let grau2 = {
+  $#h(-1pt)<#h(0pt)#text(baseline: 0.5pt)[k]^2#h(0pt)>#h(1pt)$
+}
+#let Algoritmo = "Algoritmo"
+#let algoKeywords = ("repetir", "até", "if", "then", "else", "vezes")
 #let project(fontsize:11pt, doc) ={
+
+  // set figure(placement: auto) TODO considerar
+
+  // set algo(keywords: _algo-default-keywords) // doesnt work
+  
   let calculated_leading = 10.95pt
   set heading(
     bookmarked: true
   )
   set raw(tab-size: 2)
 
+  
+  
   show raw: set text(
     font: "Fira Code"
   )
@@ -20,6 +36,8 @@
   show raw.where(block:true): it => [
     #block(fill: luma(230), inset: 6pt, radius: 1pt, it)
   ]
+
+  
   
   set text(
     font: "Times New Roman",
@@ -29,7 +47,7 @@
     region: "pt"
   )
   set page(
-    numbering: "1 / 1",
+    numbering: "1",
     margin: (left: 12mm, right: 12mm, top: 13mm, bottom: 13mm)
   )
   set par(
@@ -56,17 +74,38 @@
   show figure.where(
     kind: table
   ): set figure.caption(position: top)
+
+  show figure.where(
+    kind: algo
+  ): set figure(supplement: "Algoritmo", placement: none)
+  show figure.where(
+    kind: algo
+  ): set block(breakable: true)
+
+  show figure.where(
+    kind: Algoritmo
+  ): set figure(supplement: "Algoritmo") // n funciona?
+
+  show figure.where(
+    kind: Algoritmo
+  ): it => [
+    #set align(center)
+    #set enum(numbering: it => [#text(fill:gray)[$it$]])
+    #set list(marker: [--], indent: 0pt)
+    #set par(leading: 0.5em)
+    #rect(stroke: 0.5pt,align(left, it.body))
+    #v(-7pt)
+    #it.caption
+  ]
   show figure.caption: set text(size: fontsize - 2pt)
-  // set algo() // not an element func yet (cause it's not possible on 0.8)
   show figure.where(
     kind: grid
   ): set figure(kind: image) // n funciona n sei pq
 
-  //set figure(placement: auto)
-  show figure.where(
-    kind: "Algoritmo"
-  ): set figure(placement: none) // juro que nao percebo pq e q isto n funciona
   set list(indent: 0.6cm)
+  // show figure.where(
+  //   kind: tablex
+  // ): set figure(kind: table) // n funciona n sei pq
   doc
 }
 

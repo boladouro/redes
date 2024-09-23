@@ -4,6 +4,7 @@ library(magrittr)
 library(icecream)
 library(restorepoint)
 library(tibble)
+library(ggplot2)
 
 
 #### Questão 1 ####

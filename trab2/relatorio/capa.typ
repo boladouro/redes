@@ -64,8 +64,8 @@
   v(4.5cm)
 }
 #par(leading: 0.2cm)[
-  #text(16pt)[15 de janeiro 2024]\
-  #text(16pt)[Versão 1.0.0]
+  #text(16pt)[16 de janeiro 2024]\
+  #text(16pt)[Versão 1.0.1]
 ]
 #v(3cm)
 #set align(left)
